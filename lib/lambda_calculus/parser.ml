@@ -1,4 +1,5 @@
 open Types
+open Lexer
 
 (*
   the parser (left associative)
@@ -17,74 +18,62 @@ let print_term term =
   print_endline (term_to_string term)
 
 let parser tokens =
-  (* Mutable reference to track current position in token list *)
-  let current_pos = ref 0 in
-  let tokens_array = Array.of_list tokens in
-  
-  (* Helper to peek at current token *)
-  let peek () =
-    if !current_pos >= Array.length tokens_array then EOF
-    else tokens_array.(!current_pos)
+  let peek = function
+    | [] -> EOF
+    | t :: _ -> t
   in
   
-  (* Helper to advance to next token *)
-  let next () =
-    if !current_pos < Array.length tokens_array then
-      current_pos := !current_pos + 1
-  in
-  
-  (* Helper to match and consume expected token *)
-  let expect token =
-    if peek () = token then
-      (next (); true)
-    else false
+  let next = function
+    | [] -> []
+    | _ :: rest -> rest
   in
   
   (* Parse a single variable or parenthesized expression *)
-  let rec parse_atom () =
-    match peek () with
+  let rec parse_atom tokens =
+    match peek tokens with
     | IDENTIFIER s -> 
-        next ();
-        Var s
+        (Var s, next tokens)
     | LPAREN ->
-        next ();
-        let term = parse_term () in
-        if not (expect RPAREN) then
-          raise (Failure "Expected right parenthesis");
-        term
+        (let (term, tokens') = parse_term (next tokens) in
+        match peek tokens' with
+        | RPAREN -> (term, next tokens')
+        | _ -> raise (Failure "Expected right parenthesis"))
     | _ -> raise (Failure "Expected identifier or left parenthesis")
   
   (* Parse a sequence of applications *)
-  and parse_apps () =
-    let rec loop left =
-      match peek () with
+  and parse_apps tokens =
+    let rec loop left tokens =
+      match peek tokens with
       | IDENTIFIER _ | LPAREN ->
-          let right = parse_atom () in
-          loop (App (left, right))
-      | _ -> left
+          let (right, tokens') = parse_atom tokens in
+          loop (App (left, right)) tokens'
+      | LAMBDA ->
+          let (right, tokens') = parse_term tokens in
+          loop (App (left, right)) tokens'
+      | _ -> (left, tokens)
     in
-    let left = parse_atom () in
-    loop left
+    let (left, tokens') = parse_atom tokens in
+    loop left tokens'
   
   (* Parse a complete term *)
-  and parse_term () =
-    match peek () with
+  and parse_term tokens =
+    match peek tokens with
     | LAMBDA ->
-        next ();
-        (match peek () with
+        (match peek (next tokens) with
         | IDENTIFIER param ->
-            next ();
-            if not (expect DOT) then
+            let tokens' = next (next tokens) in
+            if peek tokens' <> DOT then
               raise (Failure "Expected dot after parameter in lambda");
-            let body = parse_term () in
-            Abs (param, body)
+            let (body, tokens'') = parse_term (next tokens') in
+            (Abs (param, body), tokens'')
         | _ -> raise (Failure "Expected identifier after lambda"))
-    | _ -> parse_apps ()
+    | _ -> parse_apps tokens
   in
   
   (* Start parsing from the first token *)
-  let result = parse_term () in
-  if !current_pos < Array.length tokens_array - 1 then
-    raise (Failure "Unexpected tokens after valid expression")
-  else
-    result
+  let (ast, remaining) = parse_term tokens in
+  match remaining with
+  | [] | [EOF] -> ast
+  | _ -> 
+      let remaining_str = String.concat " " (List.map token_to_string remaining) in
+      raise (Failure ("Unexpected tokens after valid expression: " ^ remaining_str))

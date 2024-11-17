@@ -30,9 +30,9 @@ let test_parser () = (
   print_term (parser (lexer "\\x.x"));
   print_endline "\nTesting basic application ((x y)):";
   print_term (parser (lexer "(x y)"));
-  (* print_endline "\nTesting Y combinator (\\f.(\\x.f (x x)) (\\x.f (x x))):";
-  print_term (parser (lexer "\\f.(\\x.f (x x)) (\\x.f (x x))"));*)
-  print_endline "\nTesting the Y combinator \\f.\\x.f (x x) \\x.f (x x):";
+  print_endline "\nTesting Y combinator (\\f.(\\x.f (x x)) (\\x.f (x x))):";
+  print_term (parser (lexer "\\f.(\\x.f (x x)) (\\x.f (x x))"));
+  print_endline "\nTesting the Y combinator (ambiguous) \\f.\\x.f (x x) \\x.f (x x):";
   print_term (parser (lexer "\\f.\\x.f (x x) \\x.f (x x)"));
   print_endline "\n";)
 
