@@ -58,7 +58,7 @@ let parser tokens =
   (* Parse a complete term *)
   and parse_term tokens =
     match peek tokens with
-    | LAMBDA ->
+    | LAMBDA -> (* If a lambda then we are dealing with an abstraction *)
         (match peek (next tokens) with
         | IDENTIFIER param ->
             let tokens' = next (next tokens) in
@@ -67,7 +67,7 @@ let parser tokens =
             let (body, tokens'') = parse_term (next tokens') in
             (Abs (param, body), tokens'')
         | _ -> raise (Failure "Expected identifier after lambda"))
-    | _ -> parse_apps tokens
+    | _ -> parse_apps tokens (* If not a lambda then we are dealing with an application *)
   in
   
   (* Start parsing from the first token *)
