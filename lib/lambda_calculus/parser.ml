@@ -1,5 +1,4 @@
 open Types
-open Lexer
 
 (*
   the parser (left associative)
@@ -8,15 +7,6 @@ open Lexer
   output:
     term: the parsed term
 *)
-let rec term_to_string term =
-  match term with
-  | Var s -> s
-  | Abs (s, t) -> "(\\" ^ s ^ "." ^ term_to_string t ^ ")"
-  | App (t1, t2) -> "(" ^ term_to_string t1 ^ " " ^ term_to_string t2 ^ ")"
-
-let print_term term =
-  print_endline (term_to_string term)
-
 let parser tokens =
   let peek = function
     | [] -> EOF
@@ -75,5 +65,4 @@ let parser tokens =
   match remaining with
   | [] | [EOF] -> ast
   | _ -> 
-      let remaining_str = String.concat " " (List.map token_to_string remaining) in
-      raise (Failure ("Unexpected tokens after valid expression: " ^ remaining_str))
+      raise (Failure ("Unexpected tokens after valid expression"))

@@ -6,23 +6,6 @@ let is_whitespace s =
 let is_identifier s =
   match s with 'a' .. 'z' | 'A' .. 'Z' -> true | _ -> false
 
-let token_to_string token =
-  match token with
-  | LAMBDA -> "LAMBDA"
-  | DOT -> "DOT"
-  | LPAREN -> "LPAREN"
-  | RPAREN -> "RPAREN"
-  | IDENTIFIER s -> "IDENTIFIER(" ^ s ^ ")"
-  | EOF -> "EOF"
-
-let print_tokens tokens =
-  List.iter
-    (fun token ->
-      print_string (token_to_string token);
-      print_string "; ")
-    tokens;
-  print_newline ()
-
 let lexer input =
   let rec scanner index tokens =
     if index >= String.length input then EOF :: tokens

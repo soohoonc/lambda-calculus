@@ -1,6 +1,8 @@
 open Lambda_calculus.Lexer
 open Lambda_calculus.Parser
 open Lambda_calculus.Eval
+open Lambda_calculus.Utils
+
 let test_lexer () = (
   print_endline "Testing lexer:";
   print_endline "Testing empty string:";
