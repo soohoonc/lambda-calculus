@@ -43,11 +43,11 @@ let () = test_parser ()
 let test_eval () = (
   print_endline "Testing eval:";
   print_endline "\nTesting identity function (\\x.x):";
-  print_term (eval (parser (lexer "\\x.x")));
+  print_ast (eval (parser (lexer "\\x.x")));
   print_endline "\nTesting basic application ((x y)):";
-  print_term (eval (parser (lexer "(x y)")));
+  print_ast (eval (parser (lexer "(x y)")));
   print_endline "\nTesting Y combinator (\\f.(\\x.f (x x)) (\\x.f (x x))):";
-  print_term (eval (parser (lexer "\\f.(\\x.f (x x)) (\\x.f (x x))")));
+  print_ast (eval (parser (lexer "\\f.(\\x.f (x x)) (\\x.f (x x))")));
   print_endline "\n";)
 
 let () = test_eval ()

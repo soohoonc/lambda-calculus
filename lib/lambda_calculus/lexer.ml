@@ -30,9 +30,3 @@ let lexer input =
       | _ -> failwith "Error: Unexpected character"
   in
   List.rev (scanner 0 [])
-
-(* let parser tokens = () *)
-
-(* let alpha_conversion t = (* alpha reduction *)
-   let beta_reduction t = (* beta reduction *)
-*)
